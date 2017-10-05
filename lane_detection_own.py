@@ -5,10 +5,10 @@ import sys
 
 
 
-def process_image(image=sys.argv[1]):
+def process_image(image):
 
     # variables
-    image = cv2.imread(image)
+    #image = cv2.imread(image)
     imshape = image.shape
     print imshape
     xbottom1 = int(imshape[1] / 16)
@@ -24,27 +24,27 @@ def process_image(image=sys.argv[1]):
 
     #gray image
     gray = functions.grayscale(image)
-    cv2.imshow("gray", gray)
-    cv2.waitKey()
+    #cv2.imshow("gray", gray)
+    #cv2.waitKey()
 
     kernel_size = 7
 
     #blurred image
     blurred = functions.gaussian_blur(gray, kernel_size)
-    cv2.imshow("blurred", blurred)
-    cv2.waitKey()
+    #cv2.imshow("blurred", blurred)
+    #cv2.waitKey()
 
     # region of interest
     masked_image = functions.region_of_interest(blurred, vertices)
-    cv2.imshow("masked_image", masked_image)
-    cv2.waitKey()
+    #cv2.imshow("masked_image", masked_image)
+    #cv2.waitKey()
 
     # edge image
     low_threshold = 100
     high_threshold = 200
     edge_image = functions.canny(masked_image, low_threshold, high_threshold)
-    cv2.imshow("edge image", edge_image)
-    cv2.waitKey()
+    #cv2.imshow("edge image", edge_image)
+    #cv2.waitKey()
 
     # hough_line image
     rho = 2
@@ -58,13 +58,30 @@ def process_image(image=sys.argv[1]):
     line_img = functions.hough(edge_image, rho, theta, threshold, min_line_len, max_line_gap)
     ignore_color = np.copy(line_img)*0
     line_img = np.dstack((ignore_color, ignore_color, line_img))
-    cv2.imshow("line_img",line_img)
-    cv2.waitKey()
+    #cv2.imshow("line_img",line_img)
+    #cv2.waitKey()
 
     image = functions.weighted_img(image, line_img)
-    cv2.imshow("final", image)
-    cv2.waitKey()
+    #cv2.imshow("final", image)
+    #cv2.waitKey()
+    return image
+
+def main(video):
+    cap = cv2.VideoCapture(video)
+    fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+    out = cv2.VideoWriter('processed.mp4', fourcc, 20.0, (960,540))
+    while(cap.isOpened()):
+        ret, frame = cap.read()
+        if ret == True:
+            frame = process_image(frame)
+            out.write(frame)
+        else:
+            break
+
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
-    process_image(sys.argv[1])
+    main(sys.argv[1])
