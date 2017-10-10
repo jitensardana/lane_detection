@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-from functions import grayscale, gaussian_blur, canny, my_hough_lines2, my_image_only_yellow_white_curve2, my_image_only_yellow_white_curve1, weighted_img,\
+from functions import grayscale, gaussian_blur, canny, my_hough_lines2, my_image_only_yellow_white_curve2, \
+    my_image_only_yellow_white_curve1, weighted_img, \
     region_of_interest, hough_lines
 import sys
 
@@ -29,17 +30,17 @@ def procimage2(image):
     low_threshold = 5
     high_threshold = 17
     edges = canny(blur_gray, low_threshold, high_threshold)
-    #cv2.imshow("edges",edges)
-    #cv2.waitKey()
-    #print(edges.shape)
+    # cv2.imshow("edges",edges)
+    # cv2.waitKey()
+    # print(edges.shape)
 
     # This time we are defining a four sided polygon to mask
     # We can lift the mask higher now, since the line drawing function is a bit smarter
     vertices = np.array([[(xbottom1, ybottom1), (xtop1, ytopbox), (xtop2, ytopbox), (xbottom2, ybottom2)]],
                         dtype=np.int32)
     masked_edges = region_of_interest(edges, vertices)
-    #cv2.imshow("masked", masked_edges)
-    #cv2.waitKey()
+    # cv2.imshow("masked", masked_edges)
+    # cv2.waitKey()
 
     # Define the Hough transform parameters
     # Make a blank the same size as our image to draw on
@@ -130,7 +131,7 @@ for file in files:
 
         # plot the image
         plt.imshow(image_wlines)
-        #plt.show()
+        # plt.show()
 
         # writeout the image with "-processed" in the name so it will not be reprocessed.
         plt.savefig(image_filepath.replace(".jpg", "-processed.jpg"))
