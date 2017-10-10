@@ -35,7 +35,7 @@ def region_of_interest(img, vertices):
     # defining a 3 channel or 1 channel color to fill the mask with depending on the input image
     if len(img.shape) > 2:
         channel_count = img.shape[2]
-        print (channel_count)  # i.e. 3 or 4 depending on your image
+        print(channel_count)  # i.e. 3 or 4 depending on your image
         ignore_mask_color = (255,) * channel_count
     else:
         ignore_mask_color = 255
@@ -48,11 +48,7 @@ def region_of_interest(img, vertices):
     return masked_image
 
 
-
-
-
-
-def weighted_img(img, initial_img, a=0.8, b=1., c=0.):
+def weighted_img(initial_img, img, a=0.8, b=1., c=0.):
     """
     `img` is the output of the hough_lines(), An image with lines drawn on it.
     Should be a blank image (all black) with lines drawn on it.
@@ -67,18 +63,17 @@ def weighted_img(img, initial_img, a=0.8, b=1., c=0.):
     return cv2.addWeighted(initial_img, a, img, b, c)
 
 
-
 def draw_lines(image, lines, thickness):
-    ll = {'num':0, 'slope':0.0, 'x1':0, 'y1':0, 'x2':0, 'y2':0}
-    rl = {'num':0, 'slope':0.0, 'x1' : 0, 'y1' : 0, 'x2':0, 'y2':0}
+    ll = {'num': 0, 'slope': 0.0, 'x1': 0, 'y1': 0, 'x2': 0, 'y2': 0}
+    rl = {'num': 0, 'slope': 0.0, 'x1': 0, 'y1': 0, 'x2': 0, 'y2': 0}
     ysize = image.shape[0]
 
     for line in lines:
 
         for x1, y1, x2, y2 in line:
-            slope = float((y2 - y1)/(x2 - x1))
-            #print y2, y1, x2, x1
-            #print slope
+            slope = float((y2 - y1) / (x2 - x1))
+            # print y2, y1, x2, x1
+            # print slope
             if slope > 0.49 and slope < 1.0:
                 rl['num'] += 1
                 rl['slope'] += slope
@@ -97,24 +92,24 @@ def draw_lines(image, lines, thickness):
     print(rl, ll)
 
     if rl['num'] > 0 and ll['num'] > 0:
-        rslope = rl['slope']/rl['num']
+        rslope = rl['slope'] / rl['num']
         rx1 = int(rl['x1'] / rl['num'])
-        rx2 = int(rl['x2']/ rl['num'])
-        ry1 = int(rl['y1']/rl['num'])
-        ry2 = int(rl['y2']/rl['num'])
+        rx2 = int(rl['x2'] / rl['num'])
+        ry1 = int(rl['y1'] / rl['num'])
+        ry2 = int(rl['y2'] / rl['num'])
 
-        lslope = ll['slope']/ll['num']
-        lx1 = int(ll['x1']/ll['num'])
-        lx2 = int(ll['x2']/ll['num'])
-        ly1 = int(ll['y1']/ll['num'])
-        ly2 = int(ll['y2']/ll['num'])
+        lslope = ll['slope'] / ll['num']
+        lx1 = int(ll['x1'] / ll['num'])
+        lx2 = int(ll['x2'] / ll['num'])
+        ly1 = int(ll['y1'] / ll['num'])
+        ly2 = int(ll['y2'] / ll['num'])
 
         xi = int((ly2 - ry2 + rslope * rx2 - lslope * lx2) / (rslope - lslope))
         yi = int(ry2 + rslope * (xi - rx2))
-        print ("loop")
+        print("loop")
         # calculate backoff from intercept for right line
         if rslope > 0.49 and rslope < 1:  # right
-            print ("right")
+            print("right")
             ry1 = yi + thickness * 3
             rx1 = int(rx2 - (ry2 - ry1) / rslope)
             ry2 = ysize - 1
@@ -135,7 +130,7 @@ def hough(image, rho, theta, threshold, min_line_len, max_line_gap):
     lines = cv2.HoughLinesP(image, rho, theta, threshold, minLineLength=min_line_len, maxLineGap=max_line_gap)
 
     image = draw_lines(image, lines, 7)
-    #print "hello"
-    #cv2.imshow("hough lines", image)
-    #cv2.waitKey()
+    # print "hello"
+    # cv2.imshow("hough lines", image)
+    # cv2.waitKey()
     return image

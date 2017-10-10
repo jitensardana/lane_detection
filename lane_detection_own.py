@@ -4,13 +4,11 @@ import functions
 import sys
 
 
-
 def process_image(image):
-
     # variables
-    #image = cv2.imread(image)
+    # image = cv2.imread(image)
     imshape = image.shape
-    print imshape
+    print(imshape)
     xbottom1 = int(imshape[1] / 16)
     xbottom2 = int(imshape[1] * 15 / 16)
     xtop1 = int(imshape[1] * 14 / 32)
@@ -19,58 +17,59 @@ def process_image(image):
     ybottom2 = imshape[0]
     ytopbox = int(imshape[0] * 9 / 16)
 
-    vertices = np.array([[(xbottom1, ybottom1), (xtop1, ytopbox), (xtop2, ytopbox), (xbottom2, ybottom2)]], dtype=np.int32)
+    vertices = np.array([[(xbottom1, ybottom1), (xtop1, ytopbox), (xtop2, ytopbox), (xbottom2, ybottom2)]],
+                        dtype=np.int32)
 
-
-    #gray image
+    # gray image
     gray = functions.grayscale(image)
-    #cv2.imshow("gray", gray)
-    #cv2.waitKey()
+    # cv2.imshow("gray", gray)
+    # cv2.waitKey()
 
     kernel_size = 7
 
-    #blurred image
+    # blurred image
     blurred = functions.gaussian_blur(gray, kernel_size)
-    #cv2.imshow("blurred", blurred)
-    #cv2.waitKey()
+    # cv2.imshow("blurred", blurred)
+    # cv2.waitKey()
 
     # region of interest
     masked_image = functions.region_of_interest(blurred, vertices)
-    #cv2.imshow("masked_image", masked_image)
-    #cv2.waitKey()
+    # cv2.imshow("masked_image", masked_image)
+    # cv2.waitKey()
 
     # edge image
     low_threshold = 100
     high_threshold = 200
     edge_image = functions.canny(masked_image, low_threshold, high_threshold)
-    #cv2.imshow("edge image", edge_image)
-    #cv2.waitKey()
+    # cv2.imshow("edge image", edge_image)
+    # cv2.waitKey()
 
     # hough_line image
     rho = 2
-    theta = np.pi/180
+    theta = np.pi / 180
     min_line_len = 40
     max_line_gap = 50
     threshold = 40
-    cv2.line(edge_image, (xbottom1, ybottom1), (xtop1, ytopbox), [0,0,0], thickness=2)
-    cv2.line(edge_image, (xtop2, ytopbox), (xbottom2, ybottom2), [0,0,0], thickness=2)
-    cv2.line(edge_image, (xtop1, ytopbox), (xtop2, ytopbox), [0,0,0], thickness=2)
+    cv2.line(edge_image, (xbottom1, ybottom1), (xtop1, ytopbox), [0, 0, 0], thickness=2)
+    cv2.line(edge_image, (xtop2, ytopbox), (xbottom2, ybottom2), [0, 0, 0], thickness=2)
+    cv2.line(edge_image, (xtop1, ytopbox), (xtop2, ytopbox), [0, 0, 0], thickness=2)
     line_img = functions.hough(edge_image, rho, theta, threshold, min_line_len, max_line_gap)
-    ignore_color = np.copy(line_img)*0
+    ignore_color = np.copy(line_img) * 0
     line_img = np.dstack((ignore_color, ignore_color, line_img))
-    #cv2.imshow("line_img",line_img)
-    #cv2.waitKey()
+    # cv2.imshow("line_img",line_img)
+    # cv2.waitKey()
 
     image = functions.weighted_img(image, line_img)
-    #cv2.imshow("final", image)
-    #cv2.waitKey()
+    # cv2.imshow("final", image)
+    # cv2.waitKey()
     return image
+
 
 def main(video):
     cap = cv2.VideoCapture(video)
     fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-    out = cv2.VideoWriter('processed.mp4', fourcc, 20.0, (960,540))
-    while(cap.isOpened()):
+    out = cv2.VideoWriter('processed.mp4', fourcc, 20.0, (960, 540))
+    while (cap.isOpened()):
         ret, frame = cap.read()
         if ret == True:
             frame = process_image(frame)
@@ -84,4 +83,7 @@ def main(video):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    img = process_image(cv2.imread("test_images/solidWhiteRight.jpg"))
+    cv2.imshow("op", img)
+    cv2.waitKey(0)
+    # main(sys.argv[1])
